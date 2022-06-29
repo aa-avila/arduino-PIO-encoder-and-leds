@@ -1,32 +1,27 @@
 #include <Arduino.h>
-#include <Encoder.h>
-Encoder encod(2, 3);
-long newPosition = 0;
-long oldPosition = 0;
-long lastFullStepPos = 0;
-bool fullStep = false;
-enum Rotation {
-    NONE,  // no rotation
-    CWR,   // clockwise rotation
-    CCWR   // counter-clockwise rotation
-};
-Rotation fullStepRot = NONE;
-Rotation lastFullStepRot = NONE;
 
-#include "ledBasic.h"
+#include "LedBasic.h"
 #define LED1_PIN 4
 #define LED2_PIN 5
-ledBasic led1(LED1_PIN);
-ledBasic led2(LED2_PIN);
+LedBasic led1(LED1_PIN);
+LedBasic led2(LED2_PIN);
 
-#include "ledPWM.h"
+#include "LedPWM.h"
 #define LED3_PIN 6
 #define PWM_RANGE 255
-ledPWM led3(LED3_PIN, PWM_RANGE);
+LedPWM led3(LED3_PIN, PWM_RANGE);
 int stepValuePwm = 1;
+
+#include "EasyEncoder.h"
+#include "Encoder.h"
+#define ENC_PIN_A 2
+#define ENC_PIN_B 3
+Encoder encoder(ENC_PIN_A, ENC_PIN_B);
+EasyEncoder enc;
 
 void setup() {
     Serial.begin(9600);
+    Serial.println("---------------------");
     Serial.println("Basic Encoder Test:");
     led1.init();
     led2.init();
@@ -35,46 +30,27 @@ void setup() {
 }
 
 void loop() {
-    oldPosition = newPosition;
-    fullStep = false;
-    fullStepRot = NONE;
-    newPosition = encod.read();
-    if (newPosition != oldPosition) {
-        Serial.println("****");
-        Serial.println(newPosition);
-        if (newPosition % 4 == 0) {
-            if (newPosition != lastFullStepPos) {
-                fullStep = true;
-                lastFullStepPos = newPosition;
-                if (newPosition < oldPosition) {
-                    fullStepRot = CCWR;
-                }
-                if (newPosition > oldPosition) {
-                    fullStepRot = CWR;
-                }
-                lastFullStepRot = fullStepRot;
-            }
-        }
+    enc.tick(encoder.read());
+
+    if (enc.isAbsPosChange()) {
+        Serial.println("*******");
+        Serial.println(enc.absPos());
     }
 
-    if (fullStep) {
-        // Serial.println("-----------");
-        if (fullStepRot == CCWR) {
-            Serial.println("Left - CCWR");
+    if (enc.isFullStep()) {
+        if (enc.fullStepDir() == CCW_R) {
+            Serial.println("Left - CCW_R");
             led1.on();
             led2.off();
             led3.decrease(stepValuePwm);
         }
-        if (fullStepRot == CWR) {
-            Serial.println("Right - CWR");
+        if (enc.fullStepDir() == CW_R) {
+            Serial.println("Right - CW_R");
             led2.on();
             led1.off();
             led3.increase(stepValuePwm);
         }
-        Serial.println(newPosition);
-        // Serial.println(led3.getValue());
-        // Serial.println("-----------");
-        // fullStep = false;
+        Serial.println(enc.absPos());
     }
 
     led1.update();

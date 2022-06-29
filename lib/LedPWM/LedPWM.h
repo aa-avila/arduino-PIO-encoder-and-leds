@@ -1,11 +1,11 @@
-#ifndef ledPWM_h
-#define ledPWM_h
+#ifndef LedPWM_h
+#define LedPWM_h
 
 #include <Arduino.h>
 
-class ledPWM {
+class LedPWM {
    public:
-    ledPWM(byte pin, int range);
+    LedPWM(byte pin, int range);
     void init();
     void on();
     void off();
