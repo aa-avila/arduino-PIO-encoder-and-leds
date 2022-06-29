@@ -1,17 +1,4 @@
 #include <Arduino.h>
-#include <Encoder.h>
-Encoder encoder(2, 3);
-long newPosition = 0;
-long oldPosition = 0;
-long lastFullStepPos = 0;
-bool fullStep = false;
-enum DirectionOfRotation {
-    NO_R,  // no rotation
-    CW_R,  // clockwise rotation
-    CCW_R  // counter-clockwise rotation
-};
-DirectionOfRotation fullStepRot = NO_R;
-DirectionOfRotation lastFullStepRot = NO_R;
 
 #include "LedBasic.h"
 #define LED1_PIN 4
@@ -25,6 +12,13 @@ LedBasic led2(LED2_PIN);
 LedPWM led3(LED3_PIN, PWM_RANGE);
 int stepValuePwm = 1;
 
+#include "EasyEncoder.h"
+#include "Encoder.h"
+#define ENC_PIN_A 2
+#define ENC_PIN_B 3
+Encoder encoder(ENC_PIN_A, ENC_PIN_B);
+EasyEncoder enc;
+
 void setup() {
     Serial.begin(9600);
     Serial.println("---------------------");
@@ -36,42 +30,27 @@ void setup() {
 }
 
 void loop() {
-    oldPosition = newPosition;
-    fullStep = false;
-    fullStepRot = NO_R;
-    newPosition = encoder.read();
-    if (newPosition != oldPosition) {
-        Serial.println("****");
-        Serial.println(newPosition);
-        if (newPosition % 4 == 0) {
-            if (newPosition != lastFullStepPos) {
-                if (newPosition < oldPosition) {
-                    fullStepRot = CCW_R;
-                }
-                if (newPosition > oldPosition) {
-                    fullStepRot = CW_R;
-                }
-                fullStep = true;
-                lastFullStepPos = newPosition;
-                lastFullStepRot = fullStepRot;
-            }
-        }
+    enc.tick(encoder.read());
+
+    if (enc.isAbsPosChange()) {
+        Serial.println("*******");
+        Serial.println(enc.absPos());
     }
 
-    if (fullStep) {
-        if (fullStepRot == CCW_R) {
+    if (enc.isFullStep()) {
+        if (enc.fullStepDir() == CCW_R) {
             Serial.println("Left - CCW_R");
             led1.on();
             led2.off();
             led3.decrease(stepValuePwm);
         }
-        if (fullStepRot == CW_R) {
+        if (enc.fullStepDir() == CW_R) {
             Serial.println("Right - CW_R");
             led2.on();
             led1.off();
             led3.increase(stepValuePwm);
         }
-        Serial.println(newPosition);
+        Serial.println(enc.absPos());
     }
 
     led1.update();
