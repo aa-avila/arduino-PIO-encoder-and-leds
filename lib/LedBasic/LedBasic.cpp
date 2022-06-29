@@ -1,33 +1,33 @@
-#include "ledBasic.h"
+#include "LedBasic.h"
 
 #include <Arduino.h>
 
-ledBasic::ledBasic(byte pin) {
+LedBasic::LedBasic(byte pin) {
     _pin = pin;
     _state = false;
 }
 
-void ledBasic::init() {
+void LedBasic::init() {
     pinMode(_pin, OUTPUT);
 }
 
-void ledBasic::on() {
+void LedBasic::on() {
     _state = true;
 }
 
-void ledBasic::off() {
+void LedBasic::off() {
     _state = false;
 }
 
-void ledBasic::toggle() {
+void LedBasic::toggle() {
     _state = !_state;
 }
 
-bool ledBasic::getState() {
+bool LedBasic::getState() {
     return _state;
 }
 
-void ledBasic::update() {
+void LedBasic::update() {
     if (_state) {
         digitalWrite(_pin, HIGH);
 
@@ -36,17 +36,17 @@ void ledBasic::update() {
     }
 }
 
-void ledBasic::onNow() {
+void LedBasic::onNow() {
     on();
     update();
 }
 
-void ledBasic::offNow() {
+void LedBasic::offNow() {
     off();
     update();
 }
 
-void ledBasic::toggleNow() {
+void LedBasic::toggleNow() {
     toggle();
     update();
 }

@@ -1,36 +1,36 @@
-#include "ledPWM.h"
+#include "LedPWM.h"
 
 #include <Arduino.h>
 
-ledPWM::ledPWM(byte pin, int range) {
+LedPWM::LedPWM(byte pin, int range) {
     _pin = pin;
     _range = range;
     _pwmValue = 0;
     _state = false;
 }
 
-void ledPWM::init() {
+void LedPWM::init() {
     pinMode(_pin, OUTPUT);
     analogWrite(_pin, _pwmValue);
 }
 
-void ledPWM::on() {
+void LedPWM::on() {
     _state = true;
 }
 
-void ledPWM::off() {
+void LedPWM::off() {
     _state = false;
 }
 
-void ledPWM::toggle() {
+void LedPWM::toggle() {
     _state = !_state;
 }
 
-bool ledPWM::getState() {
+bool LedPWM::getState() {
     return _state;
 }
 
-void ledPWM::setValue(int value) {
+void LedPWM::setValue(int value) {
     if (value < 0) {
         _pwmValue = 0;
     } else if (value > _range) {
@@ -40,25 +40,25 @@ void ledPWM::setValue(int value) {
     }
 }
 
-int ledPWM::getValue() {
+int LedPWM::getValue() {
     return _pwmValue;
 }
 
-void ledPWM::increase(int amount) {
+void LedPWM::increase(int amount) {
     int newValue = _pwmValue + amount;
     setValue(newValue);
 }
 
-void ledPWM::decrease(int amount) {
+void LedPWM::decrease(int amount) {
     int newValue = _pwmValue - amount;
     setValue(newValue);
 }
 
-void ledPWM::maxValue() {
+void LedPWM::maxValue() {
     _pwmValue = _range;
 }
 
-void ledPWM::update() {
+void LedPWM::update() {
     if (_state) {
         analogWrite(_pin, _pwmValue);
     } else {
@@ -66,37 +66,37 @@ void ledPWM::update() {
     }
 }
 
-void ledPWM::onNow() {
+void LedPWM::onNow() {
     on();
     update();
 }
 
-void ledPWM::offNow() {
+void LedPWM::offNow() {
     off();
     update();
 }
 
-void ledPWM::toggleNow() {
+void LedPWM::toggleNow() {
     toggle();
     update();
 }
 
-void ledPWM::setValueNow(int value) {
+void LedPWM::setValueNow(int value) {
     setValue(value);
     update();
 }
 
-void ledPWM::increaseNow(int amount) {
+void LedPWM::increaseNow(int amount) {
     increase(amount);
     update();
 }
 
-void ledPWM::decreaseNow(int amount) {
+void LedPWM::decreaseNow(int amount) {
     decrease(amount);
     update();
 }
 
-void ledPWM::maxValueNow() {
+void LedPWM::maxValueNow() {
     maxValue();
     update();
 }

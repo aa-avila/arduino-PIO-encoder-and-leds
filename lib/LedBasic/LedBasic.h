@@ -1,11 +1,11 @@
-#ifndef ledBasic_h
-#define ledBasic_h
+#ifndef LedBasic_h
+#define LedBasic_h
 
 #include <Arduino.h>
 
-class ledBasic {
+class LedBasic {
    public:
-    ledBasic(byte pin);
+    LedBasic(byte pin);
     void init();
     void on();
     void off();
